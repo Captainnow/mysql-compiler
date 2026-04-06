@@ -43,5 +43,5 @@ A lightning-fast, local web-based SQL compilation environment built with React, 
 ---
 _Developed for streamlined Data Analytics & Database Prototyping._
 
-Author:-
+**Author:-**
 V.KARTHIKEYAN
