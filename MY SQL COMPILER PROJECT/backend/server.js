@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
 const dotenv = require('dotenv');
+const path = require('path');
 
 dotenv.config();
 
@@ -9,7 +10,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 const multer = require('multer');
 const csv = require('csv-parser');
@@ -286,6 +287,12 @@ app.delete('/api/tables/:tableName', (req, res) => {
     }
     res.json({ success: true, message: `Table ${tableName} deleted successfully` });
   });
+});
+
+// Serve frontend natively for full-stack deployments
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
 });
 
 app.listen(PORT, () => {

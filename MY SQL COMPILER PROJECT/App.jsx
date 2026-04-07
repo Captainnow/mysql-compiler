@@ -10,7 +10,8 @@ import './index.css';
 const API_BASE_URL = 'http://localhost:3000/api';
 
 function App() {
-    const [query, setQuery] = useState('-- Download the SQL file below to populate the database\nSELECT * FROM users LIMIT 10;\n');
+    const defaultQuery = '-- Download the SQL file below to populate the database\nSELECT * FROM users LIMIT 10;\n';
+    const queryRef = useRef(defaultQuery);
     const [results, setResults] = useState(null);
     const [isExecuting, setIsExecuting] = useState(false);
     const [executionTime, setExecutionTime] = useState(0);
@@ -38,7 +39,7 @@ function App() {
     }
 
     const executeQuery = async (queryText) => {
-        const textToRun = typeof queryText === 'string' ? queryText : query;
+        const textToRun = typeof queryText === 'string' ? queryText : queryRef.current;
         if (!textToRun.trim()) return;
 
         setIsExecuting(true);
@@ -84,7 +85,8 @@ function App() {
             if (/^[0-9]/.test(initialTableName)) initialTableName = 't_' + initialTableName;
 
             const newQuery = `SELECT * FROM ${initialTableName} LIMIT 50;`;
-            setQuery(newQuery);
+            if (editorRef.current) editorRef.current.setValue(newQuery);
+            queryRef.current = newQuery;
 
             const response = await axios.post(`${API_BASE_URL}/execute`, { query: newQuery });
             setResults({ type: 'success', data: response.data.data, columns: response.data.columns });
@@ -152,7 +154,8 @@ function App() {
     };
 
     const clearEditor = () => {
-        setQuery('');
+        if (editorRef.current) editorRef.current.setValue('');
+        queryRef.current = '';
         setResults(null);
     };
 
@@ -183,8 +186,9 @@ function App() {
     const handlePreviewTable = (tableName) => {
         setIsFabOpen(false);
         setContextMenu(null);
-        const newQuery = `SELECT * FROM ${tableName};`;
-        setQuery(newQuery);
+        const newQuery = `SELECT * FROM ${tableName} LIMIT 500;`;
+        if (editorRef.current) editorRef.current.setValue(newQuery);
+        queryRef.current = newQuery;
         executeQuery(newQuery);
     };
 
@@ -293,8 +297,8 @@ function App() {
                                     height="100%"
                                     defaultLanguage="sql"
                                     theme="vs-light"
-                                    value={query}
-                                    onChange={setQuery}
+                                    defaultValue={defaultQuery}
+                                    onChange={(val) => { queryRef.current = val; }}
                                     onMount={handleEditorDidMount}
                                     options={{
                                         minimap: { enabled: false },
@@ -349,28 +353,35 @@ function App() {
                                 ) : (
                                     <div className="table-container">
                                         {Array.isArray(results.data) && results.data.length > 0 ? (
-                                            <table className="results-table">
-                                                <thead>
-                                                    <tr>
-                                                        {results.columns?.map((col, idx) => <th key={idx}>{col}</th>)}
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {results.data.map((row, rowIdx) => (
-                                                        <tr key={rowIdx}>
-                                                            {results.columns?.map((col, colIdx) => (
-                                                                <td key={colIdx}>
-                                                                    {row[col] === null ? (
-                                                                        <span className="null-value">NULL</span>
-                                                                    ) : (
-                                                                        typeof row[col] === 'object' ? JSON.stringify(row[col]) : String(row[col])
-                                                                    )}
-                                                                </td>
-                                                            ))}
+                                            <>
+                                                <table className="results-table">
+                                                    <thead>
+                                                        <tr>
+                                                            {results.columns?.map((col, idx) => <th key={idx}>{col}</th>)}
                                                         </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
+                                                    </thead>
+                                                    <tbody>
+                                                        {results.data.slice(0, 500).map((row, rowIdx) => (
+                                                            <tr key={rowIdx}>
+                                                                {results.columns?.map((col, colIdx) => (
+                                                                    <td key={colIdx}>
+                                                                        {row[col] === null ? (
+                                                                            <span className="null-value">NULL</span>
+                                                                        ) : (
+                                                                            typeof row[col] === 'object' ? JSON.stringify(row[col]) : String(row[col])
+                                                                        )}
+                                                                    </td>
+                                                                ))}
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                                {results.data.length > 500 && (
+                                                    <div className="limit-warning" style={{ padding: '12px', textAlign: 'center', color: '#666', background: '#f9f9f9', borderTop: '1px solid #eee', fontSize: '0.9rem' }}>
+                                                        Showing 500 of {results.data.length} rows. Use "Export as .sql" to download all data.
+                                                    </div>
+                                                )}
+                                            </>
                                         ) : (
                                             <div className="empty-state success-msg">
                                                 {results.data?.changes !== undefined

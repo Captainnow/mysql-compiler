@@ -2,6 +2,8 @@
 
 A lightning-fast, local web-based SQL compilation environment built with React, Node.js, and SQLite. This platform allows developers and data analysts to cleanly compile, execute, and preview complex SQL scripts without the need for heavy desktop database management systems.
 
+![image](https://github.com/user-attachments/assets/placeholder-image.png)
+
 ## ✨ Features
 
 - **Interactive SQL Editor**: Powered by the Monaco Editor, featuring syntax highlighting, error detection, and native IDE shortcuts (`Ctrl + Enter` to execute queries/selections).
@@ -41,7 +43,4 @@ A lightning-fast, local web-based SQL compilation environment built with React, 
 4. Open your browser and navigate to the localhost port provided by Vite (typically `http://localhost:5173`).
 
 ---
-_Developed for streamlined Data Analytics & Database Prototyping._
-
-**Author:-**
-V.KARTHIKEYAN
+_Developed by **V.KARTHIKEYAN** for streamlined Data Analytics & Database Prototyping._

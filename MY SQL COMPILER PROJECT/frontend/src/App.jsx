@@ -7,7 +7,7 @@ import {
 import axios from 'axios';
 import './index.css';
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.PROD ? '/api' : 'http://localhost:3000/api';
 
 function App() {
   const [query, setQuery] = useState('-- Download the SQL file below to populate the database\nSELECT * FROM users LIMIT 10;\n');
