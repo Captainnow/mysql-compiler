@@ -2,7 +2,6 @@
 
 A lightning-fast, local web-based SQL compilation environment built with React, Node.js, and SQLite. This platform allows developers and data analysts to cleanly compile, execute, and preview complex SQL scripts without the need for heavy desktop database management systems.
 
-![image](https://github.com/user-attachments/assets/placeholder-image.png)
 
 ## ✨ Features
 
